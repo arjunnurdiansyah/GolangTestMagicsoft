@@ -30,7 +30,6 @@ type uniqueQueue struct{
 // Fungsi newQueue digunakan untuk menentukan fixed size dari array
 func newQueue(size int) queue {
 	// Deklarasi objek queue sebanyak variabel size dan disimpan pada variabel q
-	
 	var q queue = &uniqueQueue{make([]interface{}, size)}
 	// Mengembalikan nilai dari variabel q
 	return q
