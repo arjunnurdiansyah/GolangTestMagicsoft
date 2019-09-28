@@ -134,8 +134,9 @@ func readFile(dirSrcs, dirTrgts []string) ([]string, []string) {
 }
 
 func main() {
-    // Inisialisasi path direktori
-    var myDir = "C:/GoProject/src/main/problem3"
+    // Inisialisasi full path direktori 
+    // contoh "C:/GoProject/src/main/problem3"
+    var myDir = "main/problem3"
     files, err := filePathWalk(myDir)
     if err != nil {
         log.Panic(err)
