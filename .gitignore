@@ -1,0 +1,17 @@
+# Compiled executables
+main/problem1/problem1
+main/problem2/problem2
+main/problem3/problem3
+main/problem4/problem4
+
+# Build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go workspace file
+go.work

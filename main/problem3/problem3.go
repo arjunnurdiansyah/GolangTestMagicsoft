@@ -14,6 +14,14 @@ func filePathWalk(filePath string) ([]string, error) {
     
     // Fungsi untuk melakukan scan tiap folder
     var check = func(path string, info os.FileInfo, err error) error {
+        // Check for errors first
+        if err != nil {
+            return err
+        }
+        // Check for nil info
+        if info == nil {
+            return nil
+        }
         // Seleksi kondisi jika ditemukan file maka akan disimpan pada variabel files, 
         // yang disimpan adalah path dari file.
         if !info.IsDir() {
@@ -69,43 +77,38 @@ func splitPath(dirSrcs, dirTrgts []string) ([]string, []string) {
 // Fungsi checkStatusFile digunakan untuk memberikan status dari setiap file yang ada pada folder 
 // "source" dan "target"
 func checkStatusFile(dirSrcs, dirTrgts, pathSrc, pathTrgt []string) {
-    var new, del int
-
     // Membaca isi dari semua file yang pada folder "source" dan "target"
     valSrcs, valTgts := readFile(dirSrcs, dirTrgts)
     
-    for i := 0; i < len(pathSrc); i++ {
-        for j := 0; j < len(pathTrgt); j++ {
-            // Mengecek apakah file pada folder "source" ada, namun pada folder "target" tidak ada
-            if pathSrc[i] == pathTrgt[j] {
-                new++
-            } 
-            // Mengecek apakah file pada folder "source" tidak ada, namun pada folder "target" ada
-            if pathSrc[j] == pathTrgt[i] {
-                del++
+    // Create maps for easier lookup
+    targetFiles := make(map[string]int)
+    sourceFiles := make(map[string]int)
+    
+    for i, path := range pathTrgt {
+        targetFiles[path] = i
+    }
+    for i, path := range pathSrc {
+        sourceFiles[path] = i
+    }
+    
+    // Check files in source
+    for i, srcFile := range pathSrc {
+        if targetIdx, exists := targetFiles[srcFile]; exists {
+            // File exists in both - check if modified
+            if i < len(valSrcs) && targetIdx < len(valTgts) && valSrcs[i] != valTgts[targetIdx] {
+                fmt.Println(srcFile, "MODIFIED")
             }
+        } else {
+            // File only in source - NEW
+            fmt.Println(srcFile, "NEW")
         }
-
-        // Jika pada folder "source" ada, namun pada folder "target" tidak ada, maka akan diberi status "NEW"
-        if new == 0 {
-            fmt.Println(pathSrc[i],"NEW")
-          // Mengecek apakah file yang ada pada kedua folder memiliki perbedaan atau tidak, 
-          // jika ada maka diberi status "MOIDIFIED"
-        } else if new != 0 && valSrcs[i] != valTgts[i] && valSrcs[i] != "" {
-            fmt.Println(pathSrc[i],"MOIDIFIED")        }
-        
-        //// Jika pada folder "source" tidak ada, namun pada folder "target" ada, maka akan diberi status "DELETED"
-        if del == 0 {
-            fmt.Println(pathTrgt[i],"DELETED")
-          // Mengecek apakah file yang ada pada kedua folder memiliki perbedaan atau tidak, 
-          // jika ada maka diberi status "MOIDIFIED"
-        } else  if del != 0 && valTgts[i] != valSrcs[i] && valTgts[i] != "" {
-            fmt.Println(pathTrgt[i],"MOIDIFIED")
+    }
+    
+    // Check files in target that don't exist in source - DELETED
+    for _, tgtFile := range pathTrgt {
+        if _, exists := sourceFiles[tgtFile]; !exists {
+            fmt.Println(tgtFile, "DELETED")
         }
-
-        // Mereset ulang nilai menjadi 0, agar dapat digunakan kembali sebagai penanda
-        new = 0
-        del = 0
     }
 }
 
@@ -136,7 +139,7 @@ func readFile(dirSrcs, dirTrgts []string) ([]string, []string) {
 func main() {
     // Inisialisasi full path direktori 
     // contoh "C:/GoProject/src/main/problem3"
-    var myDir = "main/problem3"
+    var myDir = "."
     files, err := filePathWalk(myDir)
     if err != nil {
         log.Panic(err)
