@@ -5,7 +5,6 @@ import "os"
 import "path/filepath"
 import "strings"
 import "log"
-import "io/ioutil"
 
 
 // Fungsi filePathWalk digunakan untuk men-scan semua file yang ada pada direktori beserta subdirektorinya
@@ -118,7 +117,7 @@ func readFile(dirSrcs, dirTrgts []string) ([]string, []string) {
     
     // Perulangan untuk membaca file pada folder "source"
     for _, dirSrc := range dirSrcs {
-        data, err := ioutil.ReadFile(dirSrc)
+        data, err := os.ReadFile(dirSrc)
         if err != nil {
             log.Panic("Error:", err)
         }
@@ -127,7 +126,7 @@ func readFile(dirSrcs, dirTrgts []string) ([]string, []string) {
 
     // Perulangan untuk membaca file pada folder "target"
     for _, dirTrgt := range dirTrgts {
-        data, err := ioutil.ReadFile(dirTrgt)
+        data, err := os.ReadFile(dirTrgt)
         if err != nil {
             log.Panic("Error:", err)
         }
